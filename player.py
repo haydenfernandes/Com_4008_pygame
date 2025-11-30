@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
             self.image.fill((255, 0, 255))
 
         self.rect = self.image.get_rect(center=pos)
+<<<<<<< HEAD
         self.speed = 5
 
     def get_input(self):
@@ -29,4 +30,6 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.get_input()
         
+=======
+>>>>>>> 739a3982bf62ac39bc3f84da2d795ab8f6111dfe
        
