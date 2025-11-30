@@ -4,18 +4,17 @@ from player import Player
 
 class Game:
     def __init__(self): # initialize game variables
-<<<<<<< HEAD
     
         player_sprite = Player((300,500)) 
         self.player = pygame.sprite.GroupSingle(player_sprite)
     def run(self): # main game loop
 
         self.player.update()    
-=======
         player_sprite = Player((300,500)) 
         self.player = pygame.sprite.GroupSingle(player_sprite)
     def run(self): # main game loop
->>>>>>> 739a3982bf62ac39bc3f84da2d795ab8f6111dfe
+        
+        self.player.update()
         self.player.draw(screen)
         
 
