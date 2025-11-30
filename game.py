@@ -5,7 +5,7 @@ from player import Player
 class Game:
     def __init__(self): # initialize game variables
     
-        player_sprite = Player((300,500)) 
+        player_sprite = Player((300,500),screenwidth, 5) 
         self.player = pygame.sprite.GroupSingle(player_sprite)
     def run(self): # main game loop
 
