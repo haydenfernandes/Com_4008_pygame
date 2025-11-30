@@ -27,12 +27,19 @@ class Player(pygame.sprite.Sprite):
             self.rect.x -= self.speed
         elif keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
+        
+        if keys[pygame.K_SPACE]:
+            self.shoot_laser()
+        
     
     def constrain(self):
         if self.rect.left <= 0:
             self.rect.left = 0
         if self.rect.right >= self.max_x_constraint:
             self.rect.right = self.max_x_constraint
+
+    def shoot_laser(self):
+        print('pew')
 
     def update(self):
         self.get_input()
