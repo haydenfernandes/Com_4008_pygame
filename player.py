@@ -25,6 +25,8 @@ class Player(pygame.sprite.Sprite):
         self.laser_time = 0
         self.laser_cooldown = 600
 
+        self.lasers = pygame.sprite.Group()
+
     def get_input(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT]:
@@ -51,7 +53,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = self.max_x_constraint
 
     def shoot_laser(self):
-        print('pew')
+        self.lasers.add(Laser(self.rect.center))
 
     def update(self):
         self.get_input()

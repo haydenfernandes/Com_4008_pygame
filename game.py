@@ -7,15 +7,19 @@ class Game:
     
         player_sprite = Player((300,500),screenwidth, 5) 
         self.player = pygame.sprite.GroupSingle(player_sprite)
-    def run(self): # main game loop
+    def run(self): 
 
         self.player.update()    
         player_sprite = Player((300,500)) 
         self.player = pygame.sprite.GroupSingle(player_sprite)
+
     def run(self): # main game loop
+
         
-        self.player.update()
-        self.player.draw(screen)
+        self.player.update()    
+
+        self.player.sprite.lasers.draw(screen)  # draw the player's lasers on the screen
+        self.player.draw(screen)  # draw the player sprite on the screen
         
 
 if __name__ == "__main__":
