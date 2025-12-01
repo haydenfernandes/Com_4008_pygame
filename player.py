@@ -1,5 +1,6 @@
 import pygame
 from pathlib import Path
+from laser import Laser
 
 
 class Player(pygame.sprite.Sprite):
