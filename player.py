@@ -31,7 +31,7 @@ class Player(pygame.sprite.Sprite):
         elif keys[pygame.K_RIGHT]:
             self.rect.x += self.speed
         
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.ready:
             self.shoot_laser()
             self.ready = False
             self.laser_time = pygame.time.get_ticks()
