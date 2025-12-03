@@ -6,11 +6,6 @@ screen = pygame.display.set_mode((screenwidth, screenheight))
 pygame.display.set_caption("space invaders")
 clock = pygame.time.Clock()
 
-# player
-player_img = pygame.image.load(r"c:\Users\Lewtunes\Downloads\space invaders\images\defender.png")
-player_img = pygame.transform.scale(player_img, (35, 30))
-player_x = (screenwidth - player_img.get_width()) // 2
-player_y = screenheight - player_img.get_height() - 10
 
 # load invader images
 invader_paths = [
@@ -109,6 +104,7 @@ while True:
 
     pygame.display.flip()
     clock.tick(60)
+
 
 
 
