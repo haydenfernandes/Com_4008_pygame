@@ -1,5 +1,6 @@
 import pygame, sys
 import random
+from pathlib import Path
 pygame.init()
 screenwidth, screenheight = 600, 600
 screen = pygame.display.set_mode((screenwidth, screenheight))
@@ -9,11 +10,11 @@ clock = pygame.time.Clock()
 
 # load invader images
 invader_paths = [
-    r"c:\Users\Lewtunes\Downloads\space invaders\images\invader1.png",
-    r"c:\Users\Lewtunes\Downloads\space invaders\images\invader2.png",
-    r"c:\Users\Lewtunes\Downloads\space invaders\images\invader3.png",
+    IMG_DIR / "invader1.png",
+    IMG_DIR / "invader2.png",
+    IMG_DIR / "invader3.png",
 ]
-invader_imgs = [pygame.transform.scale(pygame.image.load(p), (25, 25)) for p in invader_paths]
+invader_imgs = [pygame.transform.scale(pygame.image.load(str(p)), (25, 25)) for p in invader_paths]
 
 # formation
 cols = 11
@@ -38,8 +39,8 @@ descend_amount = 10
 edge_margin = 8
 
 # enemy bullets
-bullet_path = r"c:\Users\Lewtunes\Downloads\space invaders\images\bullet.png"
-enemy_bullet_img = pygame.image.load(bullet_path)
+bullet_path = IMG_DIR / "bullet.png"
+enemy_bullet_img = pygame.image.load(str(bullet_path))
 enemy_bullet_img = pygame.transform.scale(enemy_bullet_img, (5, 15))
 enemy_bullets = []
 enemy_fire_cooldown = 500   # ms between enemy shots
@@ -104,6 +105,7 @@ while True:
 
     pygame.display.flip()
     clock.tick(60)
+
 
 
 
