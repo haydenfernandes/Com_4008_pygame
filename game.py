@@ -18,7 +18,7 @@ class Game:
         
         self.player.update()    
 
-        self.player.sprite.lasers.draw(screen)  # draw the player's lasers on the screen
+        self.player.sprite.lasers.draw(screen)  # draw the player's lasers on the screen 
         self.player.draw(screen)  # draw the player sprite on the screen
         
 

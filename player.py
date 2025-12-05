@@ -59,5 +59,6 @@ class Player(pygame.sprite.Sprite):
         self.get_input()
         self.constrain()
         self.recharge()
+        self.lasers.update()
         
        

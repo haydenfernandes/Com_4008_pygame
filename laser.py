@@ -8,3 +8,7 @@ class Laser(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=pos)
         self.speed = speed
 
+    def update(self):
+        self.rect.y -= self.speed
+        if self.rect.bottom < 0:
+            self.kill()
