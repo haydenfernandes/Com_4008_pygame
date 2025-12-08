@@ -1,113 +1,127 @@
-import pygame, sys
+import pygame
 import random
 from pathlib import Path
-pygame.init()
-screenwidth, screenheight = 600, 600
-screen = pygame.display.set_mode((screenwidth, screenheight))
-pygame.display.set_caption("space invaders")
-clock = pygame.time.Clock()
 
 
-# load invader images
-invader_paths = [
-    IMG_DIR / "invader1.png",
-    IMG_DIR / "invader2.png",
-    IMG_DIR / "invader3.png",
-]
-invader_imgs = [pygame.transform.scale(pygame.image.load(str(p)), (25, 25)) for p in invader_paths]
-
-# formation
-cols = 11
-rows = 5
-spacing_x = 40
-spacing_y = 35
-total_width = (cols - 1) * spacing_x
-start_x = (screenwidth - total_width) // 2
-start_y = 60
-
-invaders = []
-for r in range(rows):
-    for c in range(cols):
-        img = invader_imgs[r % len(invader_imgs)]  
-        rect = img.get_rect(topleft=(start_x + c * spacing_x, start_y + r * spacing_y))
-        invaders.append({"img": img, "rect": rect, "alive": True})
-
-# formation movement
-invader_dir = 1        
-invader_speed = 1
-descend_amount = 10
-edge_margin = 8
-
-# enemy bullets
-bullet_path = IMG_DIR / "bullet.png"
-enemy_bullet_img = pygame.image.load(str(bullet_path))
-enemy_bullet_img = pygame.transform.scale(enemy_bullet_img, (5, 15))
-enemy_bullets = []
-enemy_fire_cooldown = 500   # ms between enemy shots
-last_enemy_fire = 0
+class Invader(pygame.sprite.Sprite):
+    def __init__(self, image, pos):
+        super().__init__()
+        self.image = image
+        self.rect = self.image.get_rect(topleft=pos)
 
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        
+class InvaderGroup(pygame.sprite.Group):
+    def __init__(self, screenwidth, screenheight):
+        super().__init__()
 
-    # move formation horizontally
-    for inv in invaders:
-        if inv["alive"]:
-            inv["rect"].x += invader_dir * invader_speed
+        self.screenwidth = screenwidth
+        self.screenheight = screenheight
 
-    # check edges and descend+reverse when necessary
-    alive_rects = [inv["rect"] for inv in invaders if inv["alive"]]
-    if alive_rects:
-        leftmost = min(r.left for r in alive_rects)
-        rightmost = max(r.right for r in alive_rects)
-        if rightmost >= screenwidth - edge_margin and invader_dir > 0:
-            invader_dir = -1
-            for inv in invaders:
-                inv["rect"].y += descend_amount
-        elif leftmost <= edge_margin and invader_dir < 0:
-            invader_dir = 1
-            for inv in invaders:
-                inv["rect"].y += descend_amount
+        # --- load invader images ---
+        root = Path(__file__).resolve().parent
+        img_dir = root / "invader_images"
 
-    screen.fill((0, 0, 0))
-    screen.blit(player_img, (player_x, player_y))
+        self.invader_imgs = []
+        for name in ("invader1.png", "invader2.png", "invader3.png"):
+            p = img_dir / name
+            try:
+                img = pygame.image.load(str(p)).convert_alpha()
+                img = pygame.transform.scale(img, (25, 25))
+            except Exception as e:
+                print(f"Warning: failed to load invader image {p}: {e}")
+                img = pygame.Surface((25, 25), pygame.SRCALPHA)
+                img.fill((200, 50, 50))
+            self.invader_imgs.append(img)
 
-    # draw invaders
-    for inv in invaders:
-        if inv["alive"]:
-            screen.blit(inv["img"], inv["rect"].topleft)
+        # --- create formation ---
+        cols = 11
+        rows = 5
+        spacing_x = 40
+        spacing_y = 35
+        total_width = (cols - 1) * spacing_x
+        start_x = (screenwidth - total_width) // 2
+        start_y = 60
 
-    # enemy firing 
-    now = pygame.time.get_ticks()
-    if now - last_enemy_fire >= enemy_fire_cooldown:
-        shooters = [inv for inv in invaders if inv["alive"]]
-        if shooters:
-            shooter = random.choice(shooters)
-            bullet_rect = enemy_bullet_img.get_rect(midtop=shooter["rect"].midbottom)
-            enemy_bullets.append(bullet_rect)
-            last_enemy_fire = now
+        for r in range(rows):
+            for c in range(cols):
+                img = self.invader_imgs[r % len(self.invader_imgs)]
+                x = start_x + c * spacing_x
+                y = start_y + r * spacing_y
+                self.add(Invader(img, (x, y)))
 
-    # update and draw enemy bullets
-    for bullet in enemy_bullets[:]:
-        bullet.y += 5  # bullet speed
-        screen.blit(enemy_bullet_img, bullet.topleft)
-        if bullet.colliderect(pygame.Rect(player_x, player_y, player_img.get_width(), player_img.get_height())):
-            print("Player hit!")
-            enemy_bullets.remove(bullet)
-        elif bullet.top > screenheight:
-            enemy_bullets.remove(bullet)
+        # --- formation movement ---
+        self.direction = 1       # 1 = right, -1 = left
+        self.speed = 1
+        self.descend_amount = 10
+        self.edge_margin = 8
 
-    
+        # --- enemy bullets ---
+        bullet_path = img_dir / "bullet.png"
+        try:
+            self.enemy_bullet_img = pygame.image.load(str(bullet_path)).convert_alpha()
+            self.enemy_bullet_img = pygame.transform.scale(self.enemy_bullet_img, (5, 15))
+        except Exception as e:
+            print(f"Warning: failed to load bullet image {bullet_path}: {e}")
+            self.enemy_bullet_img = pygame.Surface((5, 15), pygame.SRCALPHA)
+            self.enemy_bullet_img.fill((255, 255, 0))
 
-    pygame.display.flip()
-    clock.tick(60)
+        self.enemy_bullets = []
+        self.enemy_fire_cooldown = 500  # ms between shots
+        self.last_enemy_fire = 0
 
+    def update(self, *args):
+        """
+        Optionally pass the player sprite as the first arg:
+        invaders.update(player.sprite)
+        """
+        player_sprite = args[0] if args else None
 
+        # --- move formation horizontally ---
+        for inv in self.sprites():
+            inv.rect.x += self.direction * self.speed
 
+        # --- check edges, descend + reverse when needed ---
+        if self.sprites():
+            leftmost = min(inv.rect.left for inv in self.sprites())
+            rightmost = max(inv.rect.right for inv in self.sprites())
+
+            if rightmost >= self.screenwidth - self.edge_margin and self.direction > 0:
+                self.direction = -1
+                for inv in self.sprites():
+                    inv.rect.y += self.descend_amount
+            elif leftmost <= self.edge_margin and self.direction < 0:
+                self.direction = 1
+                for inv in self.sprites():
+                    inv.rect.y += self.descend_amount
+
+        # --- enemy firing ---
+        now = pygame.time.get_ticks()
+        if now - self.last_enemy_fire >= self.enemy_fire_cooldown and len(self.sprites()) > 0:
+            shooter = random.choice(self.sprites())
+            bullet_rect = self.enemy_bullet_img.get_rect(
+                midtop=shooter.rect.midbottom
+            )
+            self.enemy_bullets.append(bullet_rect)
+            self.last_enemy_fire = now
+
+        # --- update bullets & check collision with player ---
+        player_rect = player_sprite.rect if player_sprite is not None else None
+
+        for bullet in self.enemy_bullets[:]:
+            bullet.y += 5  # bullet speed
+
+            if player_rect and bullet.colliderect(player_rect):
+                print("Player hit!")
+                self.enemy_bullets.remove(bullet)
+            elif bullet.top > self.screenheight:
+                self.enemy_bullets.remove(bullet)
+
+    def draw(self, surface):
+        # draw invaders
+        super().draw(surface)
+        # draw bullets
+        for bullet in self.enemy_bullets:
+            surface.blit(self.enemy_bullet_img, bullet.topleft)
 
 
 

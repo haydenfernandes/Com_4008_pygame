@@ -5,7 +5,7 @@ from laser import Laser
 
 class Player(pygame.sprite.Sprite):
 
-    def __init__(self, pos,constraint, speed):
+    def __init__(self, pos, constraint, speed, screen_height=600):
         super().__init__()
         # load image relative to this file so the project can be moved
         img_path = Path(__file__).resolve().parent / "defender.png"
@@ -21,11 +21,14 @@ class Player(pygame.sprite.Sprite):
 
         self.speed = speed
         self.max_x_constraint = constraint
+        self.screen_height = screen_height
+
+        # laser handling
+        self.lasers = pygame.sprite.Group()
+        self.laser_speed = 7  # lower this number to slow lasers
         self.ready = True
         self.laser_time = 0
         self.laser_cooldown = 600
-
-        self.lasers = pygame.sprite.Group()
 
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -53,7 +56,8 @@ class Player(pygame.sprite.Sprite):
             self.rect.right = self.max_x_constraint
 
     def shoot_laser(self):
-        self.lasers.add(Laser(self.rect.center,7,self.max_x_constraint))
+        # spawn laser at player's top center and give proper screen height
+        self.lasers.add(Laser(self.rect.midtop, self.laser_speed, self.screen_height))
 
     def update(self):
         self.get_input()

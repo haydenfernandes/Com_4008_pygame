@@ -1,34 +1,43 @@
-import pygame,sys
-
+import pygame, sys
 from player import Player
+from invaders import InvaderGroup
+
 
 class Game:
-    def __init__(self): # initialize game variables
-    
-        player_sprite = Player((300,500),screenwidth, 5) 
+    def __init__(self, screenwidth, screenheight):
+        self.screenwidth = screenwidth
+        self.screenheight = screenheight
+
+        player_sprite = Player(
+            (screenwidth // 2, screenheight - 80),
+            screenwidth,
+            5,
+            screen_height=screenheight
+        )
         self.player = pygame.sprite.GroupSingle(player_sprite)
-    def run(self): 
 
-        self.player.update()    
-        player_sprite = Player((300,500)) 
-        self.player = pygame.sprite.GroupSingle(player_sprite)
+        self.invaders = InvaderGroup(screenwidth, screenheight)
 
-    def run(self): # main game loop
+    def run(self, screen):
+        # update
+        self.player.update()
+        self.invaders.update(self.player.sprite)  # pass player to check hits
 
-        
-        self.player.update()    
+        # draw
+        self.invaders.draw(screen)
+        self.player.draw(screen)
+        self.player.sprite.lasers.draw(screen)
 
-        self.player.sprite.lasers.draw(screen)  # draw the player's lasers on the screen 
-        self.player.draw(screen)  # draw the player sprite on the screen
-        
 
 if __name__ == "__main__":
     pygame.init()
-    screenwidth, screenheight = 600, 600 # set the screen size
+    screenwidth, screenheight = 600, 600  # set the screen size
     screen = pygame.display.set_mode((screenwidth, screenheight))
     pygame.display.set_caption("space invaders")
     clock = pygame.time.Clock()
-    game = Game()
+
+    #pass screenwidth & screenheight
+    game = Game(screenwidth, screenheight)
 
     while True:
         for event in pygame.event.get():
@@ -36,7 +45,8 @@ if __name__ == "__main__":
                 pygame.quit()
                 sys.exit()
 
-        screen.fill((0, 0, 0)) # fill the screen with black
-        game.run()  # draw sprites before flipping the display
-        pygame.display.flip()  # update the display
-        clock.tick(60)
+        screen.fill((0, 0, 0))  # fill the screen with black
+        # pass screen to run()
+        game.run(screen)        # draw sprites before flipping the display
+        pygame.display.flip()   # update the display
+        clock.tick(60)          # limit to 60 FPS
