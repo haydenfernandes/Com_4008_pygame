@@ -17,16 +17,38 @@ class Game:
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
         self.invaders = InvaderGroup(screenwidth, screenheight)
+    
+    
+    def collision_check(self):
+        for laser in self.player.sprite.lasers:
+            collided_invaders = pygame.sprite.spritecollide(laser, self.invaders, dokill=True)
+        if collided_invaders:
+            laser.kill()
+            
+
 
     def run(self, screen):
         # update
         self.player.update()
         self.invaders.update(self.player.sprite)  # pass player to check hits
 
+        self.collision_check()
+
         # draw
         self.invaders.draw(screen)
         self.player.draw(screen)
         self.player.sprite.lasers.draw(screen)
+
+    def collision_check(self):
+        for laser in self.player.sprite.lasers:
+            collided_invaders = pygame.sprite.spritecollide(
+                laser,
+                self.invaders,
+                dokill=True
+            )
+            if collided_invaders:
+                laser.kill()
+                
 
 
 if __name__ == "__main__":
