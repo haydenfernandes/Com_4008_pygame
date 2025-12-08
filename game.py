@@ -1,7 +1,7 @@
 import pygame, sys
 from player import Player
 from invaders import InvaderGroup
-
+from pathlib import Path
 
 class Game:
     def __init__(self, screenwidth, screenheight):
@@ -21,7 +21,8 @@ class Game:
         #health, score
 
         self.lives = 3
-        self.live_surf = pygame.image.load("C:\\Users\\gomes\\OneDrive\\Desktop\\Com_4008_pygame\\defender.png").convert_alpha()
+        img_path = Path(__file__).resolve().parent / "defender.png"
+        self.live_surf = pygame.image.load(str(img_path)).convert_alpha()
         self.live_surf = pygame.transform.scale(self.live_surf, (30, 30))
         self.live_x_start_pos = screenwidth - (self.lives * (self.live_surf.get_size()[0] + 10))
         
