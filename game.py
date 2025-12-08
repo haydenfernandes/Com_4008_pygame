@@ -17,20 +17,39 @@ class Game:
         self.player = pygame.sprite.GroupSingle(player_sprite)
 
         self.invaders = InvaderGroup(screenwidth, screenheight)
+
+        #health, score
+
+        self.lives = 3
+        self.live_surf = pygame.image.load("C:\\Users\\gomes\\OneDrive\\Desktop\\Com_4008_pygame\\defender.png").convert_alpha()
+        self.live_surf = pygame.transform.scale(self.live_surf, (30, 30))
+        self.live_x_start_pos = screenwidth - (self.lives * (self.live_surf.get_size()[0] + 10))
     
     
-    def collision_check(self):
-        for laser in self.player.sprite.lasers:
-            collided_invaders = pygame.sprite.spritecollide(laser, self.invaders, dokill=True)
-        if collided_invaders:
-            laser.kill()
+
+
+    def display_lives(self, surface):
+        for live in range(self.lives):
+            x = self.live_x_start_pos + (live * (self.live_surf.get_size()[0] + 10))
+            y = 8
+            surface.blit(self.live_surf, (x, y))
             
 
 
     def run(self, screen):
         # update
         self.player.update()
-        self.invaders.update(self.player.sprite)  # pass player to check hits
+        player_hit = self.invaders.update(self.player.sprite)
+
+        if player_hit:
+            self.lives -= 1
+            print("Lives left:", self.lives)
+
+        if self.lives <= 0:
+            print("GAME OVER")
+            pygame.quit()
+            sys.exit()
+  # pass player to check hits
 
         self.collision_check()
 
@@ -38,6 +57,7 @@ class Game:
         self.invaders.draw(screen)
         self.player.draw(screen)
         self.player.sprite.lasers.draw(screen)
+        self.display_lives(screen)
 
     def collision_check(self):
         for laser in self.player.sprite.lasers:

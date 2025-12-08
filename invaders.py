@@ -111,10 +111,12 @@ class InvaderGroup(pygame.sprite.Group):
             bullet.y += 5  # bullet speed
 
             if player_rect and bullet.colliderect(player_rect):
-                print("Player hit!")
                 self.enemy_bullets.remove(bullet)
+                return True 
+            
             elif bullet.top > self.screenheight:
                 self.enemy_bullets.remove(bullet)
+                return False
 
     def draw(self, surface):
         # draw invaders
