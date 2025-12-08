@@ -2,6 +2,7 @@ import pygame, sys
 from player import Player
 from invaders import InvaderGroup
 from pathlib import Path
+from obstacle import Block,shape
 
 class Game:
     def __init__(self, screenwidth, screenheight):
@@ -18,6 +19,15 @@ class Game:
 
         self.invaders = InvaderGroup(screenwidth, screenheight)
 
+
+
+        self.blocks = pygame.sprite.Group()
+        self.create_shield(50,400)
+        self.create_shield(200,400)
+        self.create_shield(350,400)
+        self.create_shield(500,400)
+
+
         #health, score
 
         self.lives = 3
@@ -33,6 +43,20 @@ class Game:
         self.game_over=False
         self.font = pygame.font.SysFont(None, 64)
         self.small_font = pygame.font.SysFont(None, 32)
+
+    def create_shield(self, x_start, y_start):
+
+        block_size = 10
+        block_color = (0, 255, 0)
+
+
+        for row_index, row in enumerate(shape):
+            for col_index, col in enumerate(row):
+                if col == 'x':
+                    x = x_start + col_index * 5
+                    y = y_start + row_index * 5
+                    block = Block(5, (0, 255, 0), x, y)
+                    self.blocks.add(block)
 
 
     def display_lives(self, surface):
@@ -68,6 +92,27 @@ class Game:
         self.invaders.draw(screen)
         self.player.draw(screen)
         self.player.sprite.lasers.draw(screen)
+        self.blocks.draw(screen)
+        
+        pygame.sprite.groupcollide(
+            self.player.sprite.lasers,  
+            self.blocks,                
+            True,                       
+            True   
+        )
+        
+        for bullet in self.invaders.enemy_bullets[:]:
+            for block in self.blocks.sprites():
+                if bullet.colliderect(block.rect):
+                    self.invaders.enemy_bullets.remove(bullet)
+                    block.kill()
+                    break
+
+                     
+
+
+
+
         self.display_lives(screen)
         self.display_score(screen)
 
