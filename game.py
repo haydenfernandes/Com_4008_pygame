@@ -45,7 +45,7 @@ class Game:
             self.lives -= 1
             print("Lives left:", self.lives)
 
-        if self.lives <= 0:
+        if self.lives < 0:
             print("GAME OVER")
             pygame.quit()
             sys.exit()
