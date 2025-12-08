@@ -55,10 +55,9 @@ class Game:
 
         if player_hit and not self.game_over:
             self.lives -= 1
-            print("Lives left:", self.lives)
+            
 
         if self.lives < 0:
-            print("GAME OVER")
             self.game_over = True
   # pass player to check hits
 
